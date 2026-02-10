@@ -618,19 +618,19 @@ def render_3dmol_xyz(
     view.zoomTo()
     view.center() # أضفنا هذا السطر لضمان أن الأنبوب في المنتصف تماماً
     
-    try:
-        if abs(float(zoom_factor) - 1.0) > 1e-6:
-            view.zoom(float(zoom_factor))
-    except Exception:
-        pass
-        
-    if spin:
-        view.spin(True)
-    
     view.setBackgroundColor("#0b1020")
-    # التأكد من مطابقة الأبعاد هنا أيضاً
-    showmol(view, height=height_px, width=700)
-
+    
+    # بدلاً من showmol(view...)، استخدم هذا الكود الاحترافي:
+    try:
+        from streamlit.components.v1 import html
+        # توليد كود الـ HTML النقي من المحرك مباشرة
+        obj_html = view._make_html()
+        # حقن الكود داخل صفحة Streamlit بشكل مباشر ومستقل
+        html(obj_html, height=height_px, width=700)
+    except Exception as e:
+        st.error(f"Error rendering 3D view: {e}")
+        # إذا فشل الحل الاحترافي، نعود للحل التقليدي كخطة بديلة
+        showmol(view, height=height_px, width=700)
 # -----------------------------
 # Streamlit App
 # -----------------------------
