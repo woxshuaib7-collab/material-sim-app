@@ -607,30 +607,29 @@ def render_3dmol_xyz(
     style_name: str,
     spin: bool,
     zoom_factor: float,
-    height_px: int = 520,
+    height_px: int = 500,
 ) -> None:
-    """
-    Render xyz content using py3Dmol within Streamlit.
-    Uses showmol to display; zoomTo() ensures camera is directed at atoms.
-    """
-    view = py3Dmol.view(width=900, height=height_px)
+    # جعلنا الأبعاد متناسقة 700x500
+    view = py3Dmol.view(width=700, height=height_px)
     view.addModel(xyz, "xyz")
     view.setStyle(_style_dict(style_name))
-    # zoomTo() before display: camera centered on atoms, not empty space
+    
+    # السر هنا: ترتيب العمليات
     view.zoomTo()
+    view.center() # أضفنا هذا السطر لضمان أن الأنبوب في المنتصف تماماً
+    
     try:
         if abs(float(zoom_factor) - 1.0) > 1e-6:
             view.zoom(float(zoom_factor))
     except Exception:
         pass
+        
     if spin:
-        try:
-            view.spin(True)
-        except Exception:
-            pass
+        view.spin(True)
+    
     view.setBackgroundColor("#0b1020")
-    showmol(view, height=500, width=700)
-
+    # التأكد من مطابقة الأبعاد هنا أيضاً
+    showmol(view, height=height_px, width=700)
 
 # -----------------------------
 # Streamlit App
