@@ -3,5 +3,7 @@ py3Dmol
 stmol
 pymatgen
 scipy
-numpy
 pandas
+numpy
+ipython_genutils
+ipywidgets
