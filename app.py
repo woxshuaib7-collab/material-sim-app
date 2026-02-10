@@ -609,31 +609,36 @@ def render_3dmol_xyz(
     zoom_factor: float,
     height_px: int = 500,
 ) -> None:
-    # جعلنا الأبعاد متناسقة 700x500
+    # 1. إنشاء الكائن
     view = py3Dmol.view(width=700, height=height_px)
     view.addModel(xyz, "xyz")
     view.setStyle(_style_dict(style_name))
-    
-    # السر هنا: ترتيب العمليات
     view.zoomTo()
-    view.center() # أضفنا هذا السطر لضمان أن الأنبوب في المنتصف تماماً
-    
+    view.center()
+    if spin:
+        view.spin(True)
     view.setBackgroundColor("#0b1020")
     
-    # بدلاً من showmol(view...)، استخدم هذا الكود الاحترافي:
-    # أضف هذين السطرين قبل الـ try
-    view.render() 
-    view.zoomTo()
-    try:
-        from streamlit.components.v1 import html
-        # توليد كود الـ HTML النقي من المحرك مباشرة
-        obj_html = view._make_html()
-        # حقن الكود داخل صفحة Streamlit بشكل مباشر ومستقل
-        html(obj_html, height=height_px, width=700)
-    except Exception as e:
-        st.error(f"Error rendering 3D view: {e}")
-        # إذا فشل الحل الاحترافي، نعود للحل التقليدي كخطة بديلة
-        showmol(view, height=height_px, width=700)
+    # 2. استخراج الـ HTML وتعديله ليكون "مستقلاً" تماماً
+    obj_html = view._make_html()
+    
+    # 3. استخدام حاوي (Container) يضمن استقرار الـ Canvas
+    # هذا الكود يمنع خطأ clearDepth عبر إجبار المتصفح على انتظار التحميل
+    wrapped_html = f"""
+    <div id="3dmol_container" style="width: 700px; height: {height_px}px; position: relative; overflow: hidden;">
+        {obj_html}
+    </div>
+    <script>
+        // إجبار المحرك على إعادة التحيين بعد نصف ثانية لضمان ظهور الذرات
+        setTimeout(function() {{
+            window.dispatchEvent(new Event('resize'));
+        }}, 500);
+    </script>
+    """
+    
+    from streamlit.components.v1 import html
+    # أهم سطر: استخدام scrolling=False و padding لمنع التداخل
+    html(wrapped_html, height=height_px + 20, width=720)
 # -----------------------------
 # Streamlit App
 # -----------------------------
