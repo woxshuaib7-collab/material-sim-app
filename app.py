@@ -621,6 +621,9 @@ def render_3dmol_xyz(
     view.setBackgroundColor("#0b1020")
     
     # بدلاً من showmol(view...)، استخدم هذا الكود الاحترافي:
+    # أضف هذين السطرين قبل الـ try
+    view.render() 
+    view.zoomTo()
     try:
         from streamlit.components.v1 import html
         # توليد كود الـ HTML النقي من المحرك مباشرة
