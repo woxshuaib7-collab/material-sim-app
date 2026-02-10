@@ -1,0 +1,8 @@
+streamlit
+py3Dmol
+stmol
+pymatgen
+rdkit-pypi
+scipy
+numpy
+pandas
