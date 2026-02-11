@@ -603,7 +603,7 @@ def _style_dict(style_name: str) -> Dict:
 
 
 def render_3dmol_xyz(xyz: str, style_name: str, spin: bool, zoom_factor: float, height_px: int = 500):
-    # 1. إعداد الشكل
+    # إعداد المحرك
     view = py3Dmol.view(width=700, height=height_px)
     view.addModel(xyz, "xyz")
     view.setStyle(_style_dict(style_name))
@@ -612,28 +612,25 @@ def render_3dmol_xyz(xyz: str, style_name: str, spin: bool, zoom_factor: float, 
         view.spin(True)
     view.setBackgroundColor("#0b1020")
     
-    # 2. استخراج الـ HTML الأساسي
+    # تحويل العرض إلى كود HTML نقي
     obj_html = view._make_html()
     
-    # 3. إضافة "مراقب" (Observer) يمنع خطأ null
-    # هذا الكود يخبر المتصفح: "لا ترسم حتى تتأكد أن الحاوية جاهزة"
+    # إضافة "مُحفز" (Trigger) لإجبار المتصفح على الرسم
     safe_html = f"""
-    <div id="mol_container" style="width:100%; height:{height_px}px;">
+    <div id="3d_viewer_container" style="width:100%; height:{height_px}px;">
         {obj_html}
     </div>
     <script>
-        var checkGL = setInterval(function() {{
-            var canvas = document.querySelector('canvas');
-            if (canvas) {{
-                window.dispatchEvent(new Event('resize'));
-                clearInterval(checkGL);
-            }}
-        }}, 100);
+        // إجبار المتصفح على إعادة تشغيل محرك WebGL بعد التحميل
+        setTimeout(function() {{
+            window.dispatchEvent(new Event('resize'));
+        }}, 1000);
     </script>
     """
     
     from streamlit.components.v1 import html
-    html(safe_html, height=height_px, width=720)
+    # استخدام سطر الـ html المباشر يتجاوز قيود Brave Shield
+    html(safe_html, height=height_px + 20)
 # -----------------------------
 # Streamlit App
 # -----------------------------
