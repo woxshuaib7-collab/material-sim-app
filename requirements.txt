@@ -1,9 +1,9 @@
 streamlit
-py3Dmol
-stmol
+py3Dmol==2.0.4
+stmol==0.0.9
 pymatgen
 scipy
-pandas
 numpy
+pandas
 ipython_genutils
 ipywidgets
